@@ -1,4 +1,4 @@
-import React, {useState, useTransition} from 'react'
+import React, {useEffect, useState, useTransition} from 'react'
 
 export default function Play() {
     //BASE GAME FUNCTIONS-----------------------------------------------------------------------------------------------
@@ -110,14 +110,12 @@ export default function Play() {
         //check number of whites
         for (let i = 0; i < guess_arr.length; i++){
             if (guess_arr[i] != -1){
-                for (let j = 0; j < code_arr.length; i++){
-                    if (code_arr[j] != -1) {
-                        if (guess_arr[i] == code_arr[j]) {
-                            num_whites++;
-                            guess_arr[i] = -1;
-                            code_arr[j] = -1;
-                            break;
-                        }
+                for (let j = 0; j < code_arr.length; j++){
+                    if (guess_arr[i] === code_arr[j]) {
+                        num_whites++;
+                        guess_arr[i] = -1;
+                        code_arr[j] = -1;
+                        break;
                     }
                 }
             }
@@ -203,28 +201,17 @@ export default function Play() {
     }
 
     //REACT GAMEPLAY FUNCTIONS------------------------------------------------------------------------------------------
-    const [currGuess, setCurrGuess] = useState("");
-    const [numGuess, setNumGuess] = useState(0);
-    const [guesses, setGuesses] = useState([]);
+    const [totalCodes, setTotalCodes] = useState<string[]>(getTotalCodes(6,4,true));
+    const [solution, setSolution] = useState(generateSolution(totalCodes));
 
-    function playMastermind(N: number,M: number,R: boolean){
-        let total_codes: string[] = getTotalCodes(N,M,R);
-        let knuth_codes: string[] = [...total_codes];
-        let possible_codes: string[] = [...total_codes];
-        let solution: string = generateSolution(total_codes);
-        let solved: boolean = false;
+    const [currGuess, setCurrGuess] = useState<string>("");
+    const [numGuess, setNumGuess] = useState<number>(0);
+    const [guesses, setGuesses] = useState<string[]>([]);
+    const [feedbacks, setFeedbacks] = useState<string[]>([]);
 
-        while (!solved){
-            let feedback = guessCode(solution, currGuess);
-            if (feedback[0] === 4 && feedback[1] === 0){
-                solved = true;
-            }
-            else{
-                pruneList(currGuess, stringifyBW(feedback), knuth_codes);
-            }
-            setNumGuess((n) => n++);
-        }
-    }
+    const [knuthCodes, setKnuthCodes] = useState<string[]>(totalCodes);
+    const [possibleCodes, setPossibleCodes] = useState<string[]>(totalCodes);
+    const [solved, setSolved] = useState<boolean>(false);
 
     function handleGuessChange(e: any){
         setCurrGuess(e.target.value);
@@ -238,8 +225,33 @@ export default function Play() {
     }
 
     function makeNewGuess() {
+        //valid checks
+        if (currGuess.length != 4){
+            return;
+        }
+        if (!containsOnlyDigits(currGuess)){
+            return;
+        }
+        //TODO: Add check to limit numbers
+
+        if (currGuess === solution){
+            setSolved(true);
+        }
+
         setGuesses(() => [...guesses, currGuess]);
+        setFeedbacks(() => [...feedbacks, stringifyBW(guessCode(currGuess, solution))]);
+        setNumGuess((n) => n+=1);
     }
+
+    //Credit: https://www.geeksforgeeks.org/how-to-check-if-string-contains-only-digits-in-javascript/
+    function containsOnlyDigits(str: string) {
+        return /^\d+$/.test(str);
+    }
+
+    //IMPLEMENTATION----------------------------------------------------------------------------------------------------
+
+    useEffect(() => {
+    }, [])
 
     return (
         <>
@@ -251,6 +263,14 @@ export default function Play() {
                 onChange={handleGuessChange}
                 onKeyDown={handleKeyDown}
             />
+            <br/>
+            <span>solution: {solution}</span>
+            <br/>
+            <span>number of guesses: {numGuess}</span>
+            <br/>
+            <ul>
+                {guesses.map((x:any, i:number) => <li key={i}>{x} {feedbacks[i]}</li>)}
+            </ul>
         </>
     )
 }
