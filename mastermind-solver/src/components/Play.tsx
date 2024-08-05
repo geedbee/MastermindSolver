@@ -1,4 +1,6 @@
 import React, {useEffect, useState, useTransition} from 'react'
+import PegBoard from "./game-components/PegBoard.tsx";
+
 
 export default function Play() {
     //BASE GAME FUNCTIONS-----------------------------------------------------------------------------------------------
@@ -213,6 +215,8 @@ export default function Play() {
     const [possibleCodes, setPossibleCodes] = useState<string[]>(totalCodes);
     const [solved, setSolved] = useState<boolean>(false);
 
+    const colors = ["red", "yellow", "black", "white", "green", "blue"];
+
     function handleGuessChange(e: any){
         setCurrGuess(e.target.value);
     }
@@ -241,6 +245,7 @@ export default function Play() {
         setGuesses(() => [...guesses, currGuess]);
         setFeedbacks(() => [...feedbacks, stringifyBW(guessCode(currGuess, solution))]);
         setNumGuess((n) => n+=1);
+        setCurrGuess("");
     }
 
     //Credit: https://www.geeksforgeeks.org/how-to-check-if-string-contains-only-digits-in-javascript/
@@ -268,9 +273,7 @@ export default function Play() {
             <br/>
             <span>number of guesses: {numGuess}</span>
             <br/>
-            <ul>
-                {guesses.map((x:any, i:number) => <li key={i}>{x} {feedbacks[i]}</li>)}
-            </ul>
+            <PegBoard colors={colors} currGuess={currGuess} setCurrGuess={setCurrGuess} guesses={guesses} feedbacks={feedbacks}></PegBoard>
         </>
     )
 }
