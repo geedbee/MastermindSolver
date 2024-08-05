@@ -1,10 +1,25 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
+import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import './index.css'
+import Play from "./components/Play.tsx";
+import Solve from "./components/Solve.tsx";
+
+const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <App/>,
+        children: [
+            {index: true, element: <Navigate replace to='/Play' />},
+            {path: '/play', element: <Play />},
+            {path: '/solve', element: <Solve />}
+        ]
+    }
+])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <RouterProvider router={router}></RouterProvider>
   </React.StrictMode>,
 )
