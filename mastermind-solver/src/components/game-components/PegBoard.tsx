@@ -14,7 +14,7 @@ export default function PegBoard(props: any) {
         <div>
             <div className="pegboard">
                 {feedbacks && guesses.map((x:string, i:number) => <Guess key={i} guess={x} colors={colors} currFeedback={feedbacks[i]} feedbackColors={feedbackColors}></Guess>)}
-                <Guess colors={colors} guess={currGuess} feedbackColors={feedbackColors} currFeedback={[]}/>
+                <Guess colors={colors} guess={currGuess} feedbackColors={feedbackColors} currFeedback={currFeedback}/>
             </div>
         </div>
     )

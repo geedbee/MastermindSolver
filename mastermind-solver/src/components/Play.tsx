@@ -274,7 +274,7 @@ export default function Play() {
             <h1>Play Mastermind</h1>
             <div className="play-board">
                 <PegBoard colors={COLORS} feedbackColors={FEEDBACK_COLORS} currGuess={currGuess} guesses={guesses}
-                          feedbacks={feedbacks}></PegBoard>
+                          feedbacks={feedbacks} currFeedback={[]}></PegBoard>
                 {!solved && <div className="hint-box">
                     <button className="enter-button" title="hints" onClick={toggleHints}>Hint?</button>
                     {isHintEnabled && <Guess colors={COLORS} guess={bestGuess} feedbackColors={FEEDBACK_COLORS} currFeedback={[]}></Guess>}
