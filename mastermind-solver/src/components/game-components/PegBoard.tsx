@@ -8,10 +8,6 @@ export default function PegBoard(props: any) {
     const guesses = props.guesses;
     const feedbacks= props.feedbacks;
 
-    function updateGuess(i:number){
-        setCurrGuess(currGuess + (i+1).toString());
-    }
-
     return (
         <div>
             <div className="pegboard">
