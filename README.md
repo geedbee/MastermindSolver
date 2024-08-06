@@ -12,14 +12,17 @@ Article 4- https://github.com/NathanDuran/Mastermind-Five-Guess-Algorithm by Git
 
 Create a Mastermind solver that will:
 
-1) Play: Allow the user to play on their own by generating a random solution, and checking each of the user’s inputs automatically
-Option: Tell the user the optimal next guess
+1) Play: Allow the user to play on their own by generating a random solution, and checking each of the user’s inputs automatically. Allow the user a hint to see the next optimal guess.
 
-2) Solve: Allow the user to input their guesses and feedback. Then, suggest the next best possible guess (solver for an already running game)
+2) Solve: Allow the user to input their guesses and feedback. Then, suggest the next best possible guess.
 
-3) Info: Explain algorithm so that it is easy to understand
+3) Info: Explain algorithm so that it is easy to understand.
 
 **Code**
 
 Tech Stack: React, Typescript
+
+**Progress**
+
+Functionally complete
 
