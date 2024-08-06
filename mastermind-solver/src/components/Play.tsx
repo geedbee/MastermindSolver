@@ -241,84 +241,9 @@ export default function Play() {
         setFeedbacks(() => [...feedbacks, stringifyBW(guessCode(currGuess, solution))]);
         setNumGuess((n) => n+=1);
 
-        pruneList();
-
-        const i = possibleCodes.indexOf(currGuess);
-        setPossibleCodes((p) => p.splice(i,1));
-
-        setBestGuess(getCode());
         setCurrGuess("");
     }
 
-    function getCode(): string{
-        let guess_codes: string[] = miniMax();
-        let code: string = getGuessCodeFromList(guess_codes);
-        return code;
-    }
-
-    function miniMax(): string[]{
-        const counts = new Map();
-        //For each possible code, find the worst case amount of knuth_codes it can eliminate
-        for (let i =0; i < possibleCodes.length; i++){
-            const times_found = new Map();
-            let maxCount = 0;
-            for (let j = 0; j < knuthCodes.length; j++){
-                const feedback = guessCode(knuthCodes[j], possibleCodes[i]);
-                let ref = times_found.get(stringifyBW(feedback));
-                if (!ref){
-                    times_found.set(stringifyBW(feedback), 1);
-                }
-                else {
-                    times_found.set(stringifyBW(feedback), ++ref);
-                    if (ref > maxCount){
-                        maxCount = ref;
-                    }
-                }
-            }
-            counts.set(possibleCodes[i], maxCount);
-        }
-        //For the map of counts, find the minimum value
-        let min_val: number = 100000;
-        for (let count of counts.values()) {
-            if (count < min_val){
-                min_val = count;
-            }
-        }
-        //Return all guesses that have that minimum value
-        let guess_codes: string[] = [];
-        for (let [key, value] of counts) {
-            if (value === min_val){
-                guess_codes.push(key);
-            }
-        }
-        console.log(min_val);
-        console.log(counts);
-        console.log(guess_codes);
-        return guess_codes;
-    }
-
-    function getGuessCodeFromList(guess_codes:string[]){
-        for (let i = 0; i < guess_codes.length; i++){
-            for (let j = 0; j < knuthCodes.length; j++) {
-                if (guess_codes[i] === knuthCodes[j]) {
-                    return guess_codes[i];
-                }
-            }
-        }
-        return guess_codes[0];
-    }
-
-    function pruneList(){
-        const feedback = stringifyBW(guessCode(solution, currGuess));
-        for (let i=0; i < knuthCodes.length; i++){
-            const new_feedback = stringifyBW(guessCode(knuthCodes[i], currGuess));
-            if (new_feedback !== feedback){
-                setKnuthCodes((s) => s.splice(i, 1));
-            }
-            else{
-            }
-        }
-    }
 
     //Credit: https://www.geeksforgeeks.org/how-to-check-if-string-contains-only-digits-in-javascript/
     function containsOnlyDigits(str: string) {
