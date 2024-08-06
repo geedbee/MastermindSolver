@@ -14,15 +14,9 @@ export default function PegBoard(props: any) {
 
     return (
         <div>
-            {colors.map((x:string,i:number) => <button key={i}
-                title="Press me"
-                style={{"backgroundColor":x}}
-                className="pegboard-button"
-                onClick={() => updateGuess(i)}
-            />
-            )}
             <div className="pegboard">
                 {guesses.map((x:string, i:number) => <Guess key={i} guess={x} colors={colors} feedback={feedbacks[i]}></Guess>)}
+                <Guess guess={currGuess} colors={colors}></Guess>
             </div>
         </div>
     )

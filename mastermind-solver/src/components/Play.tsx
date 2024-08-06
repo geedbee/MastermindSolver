@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useTransition} from 'react'
 import PegBoard from "./game-components/PegBoard.tsx";
+import {c} from "vite/dist/node/types.d-aGj9QkWt";
 
 
 export default function Play() {
@@ -86,10 +87,11 @@ export default function Play() {
     //Input: An array of numbers
     //Output: A list of permutations of numbers
     //Credit: https://stackoverflow.com/questions/9960908/permutations-in-javascript, Andrew Richesson
+    //EDITED TO INCLUDE PERMUTATIONS WITH REPETITION
     function generatePermutations(list, size=list.length) {
         if (size > list.length) return [];
         else if (size == 1) return list.map(d=>[d]);
-        return list.flatMap(d => generatePermutations(list.filter(a => a !== d), size - 1).map(item => [d, ...item]));
+        return list.flatMap(d => generatePermutations(list, size - 1).map(item => [d, ...item]));
     }
 
     //Function: Compare two codes and return the [blacks, whites]
@@ -129,7 +131,7 @@ export default function Play() {
     //Function: Get the best possible guess, using the minimax algorithm
     //Input: Knuth codes, possible codes
     //Output: One code
-    function getCode(knuth_codes: string[], possible_codes: string[]): string{
+    /*function getCode(knuth_codes: string[], possible_codes: string[]): string{
         let guess_codes: string[] = miniMax(knuth_codes, possible_codes);
         let code: string = getGuessCodeFromList(knuth_codes, guess_codes);
         //remove from possible_codes
@@ -200,7 +202,7 @@ export default function Play() {
                 knuth_nodes.splice(i, 1);
             }
         }
-    }
+    }*/
 
     //REACT GAMEPLAY FUNCTIONS------------------------------------------------------------------------------------------
     const [totalCodes, setTotalCodes] = useState<string[]>(getTotalCodes(6,4,true));
@@ -214,18 +216,12 @@ export default function Play() {
     const [knuthCodes, setKnuthCodes] = useState<string[]>(totalCodes);
     const [possibleCodes, setPossibleCodes] = useState<string[]>(totalCodes);
     const [solved, setSolved] = useState<boolean>(false);
+    const [bestGuess, setBestGuess] = useState<string>("1122");
 
     const colors = ["red", "yellow", "green", "blue", "black", "white"];
 
-    function handleGuessChange(e: any){
-        setCurrGuess(e.target.value);
-    }
-
-    function handleKeyDown(e : any){
-        //console.log(e.key);
-        if (e.key === "Enter"){
-            makeNewGuess();
-        }
+    function undoGuess(){
+        setCurrGuess(currGuess.slice(0,currGuess.length-1));
     }
 
     function makeNewGuess() {
@@ -237,7 +233,6 @@ export default function Play() {
             return;
         }
         //TODO: Add check to limit numbers
-
         if (currGuess === solution){
             setSolved(true);
         }
@@ -245,7 +240,84 @@ export default function Play() {
         setGuesses(() => [...guesses, currGuess]);
         setFeedbacks(() => [...feedbacks, stringifyBW(guessCode(currGuess, solution))]);
         setNumGuess((n) => n+=1);
+
+        pruneList();
+
+        const i = possibleCodes.indexOf(currGuess);
+        setPossibleCodes((p) => p.splice(i,1));
+
+        setBestGuess(getCode());
         setCurrGuess("");
+    }
+
+    function getCode(): string{
+        let guess_codes: string[] = miniMax();
+        let code: string = getGuessCodeFromList(guess_codes);
+        return code;
+    }
+
+    function miniMax(): string[]{
+        const counts = new Map();
+        //For each possible code, find the worst case amount of knuth_codes it can eliminate
+        for (let i =0; i < possibleCodes.length; i++){
+            const times_found = new Map();
+            let maxCount = 0;
+            for (let j = 0; j < knuthCodes.length; j++){
+                const feedback = guessCode(knuthCodes[j], possibleCodes[i]);
+                let ref = times_found.get(stringifyBW(feedback));
+                if (!ref){
+                    times_found.set(stringifyBW(feedback), 1);
+                }
+                else {
+                    times_found.set(stringifyBW(feedback), ++ref);
+                    if (ref > maxCount){
+                        maxCount = ref;
+                    }
+                }
+            }
+            counts.set(possibleCodes[i], maxCount);
+        }
+        //For the map of counts, find the minimum value
+        let min_val: number = 100000;
+        for (let count of counts.values()) {
+            if (count < min_val){
+                min_val = count;
+            }
+        }
+        //Return all guesses that have that minimum value
+        let guess_codes: string[] = [];
+        for (let [key, value] of counts) {
+            if (value === min_val){
+                guess_codes.push(key);
+            }
+        }
+        console.log(min_val);
+        console.log(counts);
+        console.log(guess_codes);
+        return guess_codes;
+    }
+
+    function getGuessCodeFromList(guess_codes:string[]){
+        for (let i = 0; i < guess_codes.length; i++){
+            for (let j = 0; j < knuthCodes.length; j++) {
+                if (guess_codes[i] === knuthCodes[j]) {
+                    return guess_codes[i];
+                }
+            }
+        }
+        return guess_codes[0];
+    }
+
+    function pruneList(){
+        const feedback = stringifyBW(guessCode(solution, currGuess));
+        for (let i=0; i < knuthCodes.length; i++){
+            const new_feedback = stringifyBW(guessCode(knuthCodes[i], currGuess));
+            if (new_feedback !== feedback){
+                setKnuthCodes((s) => s.splice(i, 1));
+            }
+            else{
+            }
+        }
     }
 
     //Credit: https://www.geeksforgeeks.org/how-to-check-if-string-contains-only-digits-in-javascript/
@@ -253,27 +325,36 @@ export default function Play() {
         return /^\d+$/.test(str);
     }
 
+    function updateGuess(i:number){
+        setCurrGuess(currGuess + (i+1).toString());
+    }
+
     //IMPLEMENTATION----------------------------------------------------------------------------------------------------
 
     useEffect(() => {
+        console.log(solution)
     }, [])
 
     return (
         <>
             <h1>Play Mastermind</h1>
-            <input
-                type="text"
-                placeholder="Enter guess"
-                value={currGuess}
-                onChange={handleGuessChange}
-                onKeyDown={handleKeyDown}
-            />
-            <br/>
-            <span>solution: {solution}</span>
-            <br/>
-            <span>number of guesses: {numGuess}</span>
-            <br/>
-            <PegBoard colors={colors} currGuess={currGuess} setCurrGuess={setCurrGuess} guesses={guesses} feedbacks={feedbacks}></PegBoard>
+            <PegBoard colors={colors} currGuess={currGuess} setCurrGuess={setCurrGuess} guesses={guesses}
+                      feedbacks={feedbacks}></PegBoard>
+            <div className="buttons">
+                {colors.map((x: string, i: number) => <button key={i}
+                                                              title="Press me"
+                                                              style={{"backgroundColor": x}}
+                                                              className="pegboard-button"
+                                                              onClick={() => updateGuess(i)}
+                    />
+                )}
+                <button className="enter-button" title="submit" onClick={makeNewGuess}>Enter</button>
+                <button className="enter-button" title="undo" onClick={undoGuess}>Undo</button>
+            </div>
+            <div>
+                Solver:
+                {bestGuess}
+            </div>
         </>
     )
 }

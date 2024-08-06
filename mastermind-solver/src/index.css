@@ -1,6 +1,20 @@
 .pegboard-button{
     height:50px;
     width:50px;
+    border: 3px solid black;
+    border-radius: 15px;
+}
+
+.enter-button{
+    height:50px;
+    width:100px;
+    border: 3px solid black;
+    border-radius: 15px;
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
 }
 
 .pegboard-color{

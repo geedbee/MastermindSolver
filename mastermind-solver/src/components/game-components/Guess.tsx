@@ -4,15 +4,21 @@ export default function Guess(props) {
     const colors = props.colors;
     const guess = props.guess;
     const guessArr = guess.split("");
-    const feedback = props.feedback;
-    const feedbackArr = feedback.split("/");
+    let feedback = "";
+    let feedbackArr:number[] = [];
     let feedbackArrColors =[];
-    for (let i = 0; i < feedbackArr[0]; i++){
-        feedbackArrColors.push("black");
+
+    if (props.feedback) {
+        feedback = props.feedback;
+        feedbackArr = feedback.split("/");
+        for (let i = 0; i < feedbackArr[0]; i++){
+            feedbackArrColors.push("black");
+        }
+        for (let i = 0; i < feedbackArr[1]; i++){
+            feedbackArrColors.push("white");
+        }
     }
-    for (let i = 0; i < feedbackArr[1]; i++){
-        feedbackArrColors.push("white");
-    }
+
 
     return (
         <div className="pegboard-row">
