@@ -215,7 +215,7 @@ export default function Play() {
     const [possibleCodes, setPossibleCodes] = useState<string[]>(totalCodes);
     const [solved, setSolved] = useState<boolean>(false);
 
-    const colors = ["red", "yellow", "black", "white", "green", "blue"];
+    const colors = ["red", "yellow", "green", "blue", "black", "white"];
 
     function handleGuessChange(e: any){
         setCurrGuess(e.target.value);

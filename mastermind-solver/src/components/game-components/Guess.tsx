@@ -15,19 +15,21 @@ export default function Guess(props) {
     }
 
     return (
-        <div>
-            {guessArr.map((x:number,i:number) => <button key={i}
-                title="Press me"
-                style={{"backgroundColor": colors[x-1]}}
-                className="pegboard-button"
-            />)}
-
-            {feedbackArrColors.map((x:string,i:number) =>
-                <button key={i}
-                        style={{"backgroundColor": x}}
-                        className="pegboard-peg"
-                />
-            )}
+        <div className="pegboard-row">
+            <div className="pegboard-colors">
+                {guessArr.map((x:number,i:number) => <div key={i}
+                  style={{"backgroundColor": colors[x-1]}}
+                  className="pegboard-color"
+                ></div>)}
+            </div>
+            <div className="pegboard-pegs">
+                {feedbackArrColors.map((x:string,i:number) =>
+                    <div key={i}
+                         style={{"backgroundColor": x}}
+                         className="pegboard-peg"
+                    ></div>
+                )}
+            </div>
         </div>
     )
 }

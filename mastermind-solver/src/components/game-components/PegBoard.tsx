@@ -21,8 +21,9 @@ export default function PegBoard(props: any) {
                 onClick={() => updateGuess(i)}
             />
             )}
-
-            {guesses.map((x:string, i:number) => <Guess key={i} guess={x} colors={colors} feedback={feedbacks[i]}></Guess>)}
+            <div className="pegboard">
+                {guesses.map((x:string, i:number) => <Guess key={i} guess={x} colors={colors} feedback={feedbacks[i]}></Guess>)}
+            </div>
         </div>
     )
 }
