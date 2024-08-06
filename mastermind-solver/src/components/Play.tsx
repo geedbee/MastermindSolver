@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import PegBoard from "./game-components/PegBoard.tsx";
+import Guess from "./game-components/Guess.tsx";
 
 const N = 6; //number of colors
 const M = 4; //length of code
@@ -159,6 +160,7 @@ export default function Play() {
     const [feedbacks, setFeedbacks] = useState<string[]>([]);
     const [solved, setSolved] = useState<boolean>(false);
     const [bestGuess, setBestGuess] = useState<string>("1122");
+    const [isHintEnabled, setIsHintEnabled] = useState<boolean>(false);
 
     function undoGuess(){
         setCurrGuess(currGuess.slice(0,currGuess.length-1));
@@ -172,23 +174,17 @@ export default function Play() {
         if (!containsOnlyDigits(currGuess)){
             return;
         }
-        //TODO: Add check to limit numbers
         if (currGuess === solution){
             setSolved(true);
         }
-
         setGuesses(() => [...guesses, currGuess]);
         setFeedbacks(() => [...feedbacks, stringifyBW(guessCode(currGuess, solution))]);
         setNumGuess((n) => n+=1);
 
-        console.log(solution);
         pruneList(currGuess, stringifyBW(guessCode(currGuess, solution)), knuth_codes);
         const i = possible_codes.indexOf(currGuess);
         possible_codes.splice(i, 1);
         setBestGuess(getCode(knuth_codes, possible_codes));
-        console.log(total_codes);
-        console.log(knuth_codes);
-        console.log(possible_codes);
 
         setCurrGuess("");
     }
@@ -200,19 +196,40 @@ export default function Play() {
     }
 
     function updateGuess(i:number){
-        setCurrGuess(currGuess + (i+1).toString());
+        if (currGuess.length < 4){
+            setCurrGuess(currGuess + (i+1).toString());
+        }
     }
 
-    //IMPLEMENTATION----------------------------------------------------------------------------------------------------
+    function toggleHints(){
+        setIsHintEnabled(!isHintEnabled);
+    }
 
-    useEffect(() => {
-    }, [])
+    function resetGame(){
+        total_codes = getTotalCodes(N,M,R);
+        knuth_codes = [...total_codes];
+        possible_codes = [...total_codes];
+        solution = generateSolution(total_codes);
+        setCurrGuess("");
+        setNumGuess(0);
+        setGuesses([]);
+        setFeedbacks([]);
+        setSolved(false);
+        setBestGuess("1122");
+        setIsHintEnabled(false);
+    }
 
     return (
         <>
             <h1>Play Mastermind</h1>
-            <PegBoard colors={colors} currGuess={currGuess} setCurrGuess={setCurrGuess} guesses={guesses}
-                      feedbacks={feedbacks}></PegBoard>
+            <div className="play-board">
+                <PegBoard colors={colors} currGuess={currGuess} setCurrGuess={setCurrGuess} guesses={guesses}
+                          feedbacks={feedbacks}></PegBoard>
+                {!solved && <div className="hint-box">
+                    <button className="enter-button" title="hints" onClick={toggleHints}>Hint?</button>
+                    {isHintEnabled && <Guess colors={colors} guess={bestGuess}></Guess>}
+                </div>}
+            </div>
             <div className="buttons">
                 {colors.map((x: string, i: number) => <button key={i}
                                                               title="Press me"
@@ -223,10 +240,7 @@ export default function Play() {
                 )}
                 <button className="enter-button" title="submit" onClick={makeNewGuess}>Enter</button>
                 <button className="enter-button" title="undo" onClick={undoGuess}>Undo</button>
-            </div>
-            <div>
-                Solver:
-                {bestGuess}
+                {solved && <button className="enter-button" title="reset" onClick={resetGame}>Reset</button>}
             </div>
         </>
     )

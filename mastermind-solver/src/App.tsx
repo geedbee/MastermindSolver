@@ -13,6 +13,9 @@ function App() {
                       <li>
                           <NavLink to='/solve'>Solve</NavLink>
                       </li>
+                      <li>
+                          <NavLink to='/info'>Info</NavLink>
+                      </li>
                   </ul>
               </nav>
           </div>

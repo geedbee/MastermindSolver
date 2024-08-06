@@ -28,14 +28,14 @@ export default function Guess(props) {
                   className="pegboard-color"
                 ></div>)}
             </div>
-            <div className="pegboard-pegs">
+            {feedback && <div className="pegboard-pegs">
                 {feedbackArrColors.map((x:string,i:number) =>
                     <div key={i}
                          style={{"backgroundColor": x}}
                          className="pegboard-peg"
                     ></div>
                 )}
-            </div>
+            </div>}
         </div>
     )
 }
