@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PegBoard from "./game-components/PegBoard.tsx";
 import Guess from "./game-components/Guess.tsx";
 
@@ -166,32 +166,23 @@ export default function Solve() {
     }
 
     function makeNewGuess() {
-        //valid checks
-        if (currGuess.length != 4){
-            return;
-        }
-        if (!containsOnlyDigits(currGuess)){
-            return;
-        }
         setGuesses(() => [...guesses, currGuess]);
-        setFeedbacks(() => [...feedbacks, stringifyBW(guessCode(currGuess, solution))]);
-        setNumGuess((n) => n+=1);
+        setFeedbacks(() => [...feedbacks, currFeedback]);
 
-        pruneList(currGuess, stringifyBW(guessCode(currGuess, solution)), knuth_codes);
+        pruneList(currGuess, currFeedback, knuth_codes);
         const i = possible_codes.indexOf(currGuess);
         possible_codes.splice(i, 1);
         setBestGuess(getCode(knuth_codes, possible_codes));
 
         setCurrGuess("");
+        setCurrFeedback("");
     }
 
-    function updateFeedback(i){
-        setCurrFeedback(currFeedback + (i+1).toString());
+    function updateFeedback(i: number){
+        if (currFeedback.length < 4){
+            setCurrFeedback(currFeedback + (i+1).toString());
+        }
     }
-    function makeNewFeedback(){
-
-    }
-
 
     //Credit: https://www.geeksforgeeks.org/how-to-check-if-string-contains-only-digits-in-javascript/
     function containsOnlyDigits(str: string) {
@@ -210,6 +201,7 @@ export default function Solve() {
         knuth_codes = [...total_codes];
         possible_codes = [...total_codes];
         setCurrGuess("");
+        setCurrFeedback("");
         setNumGuess(0);
         setGuesses([]);
         setFeedbacks([]);
@@ -221,8 +213,11 @@ export default function Solve() {
         <>
             <h1>Solve Mastermind</h1>
             <div className="play-board">
-                <PegBoard colors={colors} currGuess={currGuess} setCurrGuess={setCurrGuess} guesses={guesses}
-                          feedbacks={feedbacks}></PegBoard>
+                <PegBoard colors={colors} feedbackColors={feedbackColors} currGuess={currGuess} guesses={guesses}
+                          feedbacks={feedbacks} currFeedback={currFeedback}></PegBoard>
+                <div className="hint-box">
+                    <Guess colors={colors} guess={bestGuess} feedbackColors={feedbackColors} currFeedback={""}/>
+                </div>
             </div>
             <div className="buttons">
                 {colors.map((x: string, i: number) => <button key={i}
@@ -232,7 +227,6 @@ export default function Solve() {
                                                               onClick={() => updateGuess(i)}
                     />
                 )}
-
                 {feedbackColors.map((x: string, i: number) => <button key={i}
                                                                       title="Press me"
                                                                       style={{"backgroundColor": x}}
