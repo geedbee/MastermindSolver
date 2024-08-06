@@ -137,10 +137,15 @@ function getGuessCodeFromList(knuth_codes: string[], guess_codes:string[]){
 }
 
 function pruneList(guess:string, feedback:string, knuth_nodes:string[]){
+    //console.log(guess);
+    //console.log(feedback);
     for (let i=0; i < knuth_nodes.length; i++){
         const new_feedback = stringifyBW(guessCode(knuth_nodes[i], guess));
+        //console.log(knuth_nodes[i]);
+        //console.log(new_feedback);
         if (new_feedback !== feedback){
             knuth_nodes.splice(i, 1);
+            i--;
         }
     }
 }
@@ -181,6 +186,9 @@ export default function Play() {
         const i = possible_codes.indexOf(currGuess);
         possible_codes.splice(i, 1);
         setBestGuess(getCode(knuth_codes, possible_codes));
+        console.log(total_codes);
+        console.log(knuth_codes);
+        console.log(possible_codes);
 
         setCurrGuess("");
     }
